@@ -33,48 +33,63 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
+  // Resize map to fill from #logic to bottom of page
+  function resizeMap() {
+    const logicHeight = document.getElementById('logic').offsetHeight;
+    const windowHeight = window.innerHeight;
+    const map = document.getElementById('map');
+    map.style.height = (windowHeight - logicHeight) + 'px';
+  }
 
-function resizeMap() {
-const logicHeight = document.getElementById('logic').offsetHeight;
-const map = document.getElementById('map');
-const windowHeight = window.innerHeight;
-map.style.height = (windowHeight - logicHeight) + 'px';
-}
+  window.addEventListener('resize', resizeMap);
+  window.addEventListener('load', () => {
+    resizeMap(); // initial resize
 
-window.addEventListener('resize', resizeMap);
-window.addEventListener('load', () => {
-resizeMap(); // set initial height
+    // Setup map
+    const map = L.map('map').setView([50.0, 14.0], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-const map = L.map('map').setView([50.0, 14.0], 13);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-const marker = L.circleMarker([50.0, 14.0], {radius: 8, color: 'red'}).addTo(map);
+    const marker = L.circleMarker([50.0, 14.0], {
+      radius: 8,
+      color: 'red'
+    }).addTo(map);
 
-let current = {lat: 50.0, lon: 14.0};
-let target = {lat: 50.0, lon: 14.0};
-let lastUpdate = performance.now();
+    // Smooth position interpolation
+    let current = { lat: 50.0, lon: 14.0 };
+    let target = { lat: 50.0, lon: 14.0 };
+    let lastUpdate = performance.now();
 
-function updateLocation() {
-  fetch('/location')
-    .then(res => res.json())
-    .then(data => {
-      current = {...target}; // set current to previous target
-      target = data;
-      lastUpdate = performance.now();
-    });
-}
+    function updateLocation() {
+      fetch('/location')
+        .then(res => res.json())
+        .then(data => {
+          current = { ...target };
+          target = data;
+          lastUpdate = performance.now();
+        })
+        .catch(console.error);
+    }
 
-function animate() {
-  const now = performance.now();
-  const progress = Math.min(1, (now - lastUpdate) / 100); // 100ms interval
-  const lat = current.lat + (target.lat - current.lat) * progress;
-  const lon = current.lon + (target.lon - current.lon) * progress;
-  marker.setLatLng([lat, lon]);
-  requestAnimationFrame(animate);
-}
+    function animate() {
+      const now = performance.now();
+      const progress = Math.min(1, (now - lastUpdate) / 100);
+      const lat = current.lat + (target.lat - current.lat) * progress;
+      const lon = current.lon + (target.lon - current.lon) * progress;
+      marker.setLatLng([lat, lon]);
+      requestAnimationFrame(animate);
+    }
 
-setInterval(updateLocation, 100);
-animate();
+    setInterval(updateLocation, 100);
+    animate();
+});
 
+const data =  ['ISS (ZARYA)', 'CSS (TIANHE)', 'ISS (NAUKA)', 'FREGAT DEB', 'CSS (WENTIAN)', 'CSS (MENGTIAN)', 'TIANZHOU-8', 'PROGRESS-MS 29', 'PROGRESS-MS 30', 'CREW DRAGON 10', 'SOYUZ-MS 27', 'SHENZHOU-20 (SZ-20)']
+
+const container = document.getElementById('checkboxList');
+data.forEach(item => {
+    const id = 'chk_' + item.replace(/\W/g, '_');
+    container.innerHTML += `<label><input type="checkbox" id="${id}" value="${item}"> ${item}</label><br>`;
+});
 </script>
 
 
