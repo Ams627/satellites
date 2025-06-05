@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Satellite Tracker</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="">
+<style>
+</style>
+<body>
+
+<div id="checkboxList" style="max-height: 400px; overflow-y: scroll; border: 1px solid #ccc;"></div>
+
+<script>
+const data =  ['ISS (ZARYA)', 'CSS (TIANHE)', 'ISS (NAUKA)', 'FREGAT DEB', 'CSS (WENTIAN)', 'CSS (MENGTIAN)', 'TIANZHOU-8', 'PROGRESS-MS 29', 'PROGRESS-MS 30', 'CREW DRAGON 10', 'SOYUZ-MS 27', 'SHENZHOU-20 (SZ-20)']
+
+const container = document.getElementById('checkboxList');
+data.forEach(item => {
+    const id = 'chk_' + item.replace(/\W/g, '_');
+    container.innerHTML += `<label><input type="checkbox" id="${id}" value="${item}"> ${item}</label><br>`;
+});
+</script>
+
+
+</body>
+</html>
